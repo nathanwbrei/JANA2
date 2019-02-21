@@ -136,8 +136,8 @@ class JApplication{
 		
 		//GET/RECYCLE POOL RESOURCES
 		std::shared_ptr<JTask<void>> GetVoidTask(void);
-		JFactorySet* GetFactorySet(void);
-		void Recycle(JFactorySet* aFactorySet);
+		///JFactorySet* GetFactorySet(void);
+		//void Recycle(JFactorySet* aFactorySet);
 		void UpdateResourceLimits(void);
 
 		uint32_t GetCPU(void);
@@ -196,7 +196,8 @@ class JApplication{
 		// Resource pools
 		// TODO: Add methods to set control parameters
 		JResourcePool<JTask<void>> mVoidTaskPool;
-		JResourcePool<JFactorySet> mFactorySetPool;
+		// TODO: Delete me when the time comes
+		//JResourcePool<JFactorySet> mFactorySetPool;
 
 };
 

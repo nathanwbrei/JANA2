@@ -86,6 +86,8 @@ class JThread{
 		void Run(void);
 		void Stop(bool wait_until_idle = false);
 		
+		JFactorySet* GetFactorySet() { return mFactorySet; };
+
 	protected:
 		
 		JApplication* mApplication = nullptr;
@@ -109,6 +111,9 @@ class JThread{
 		std::map<std::string, uint64_t> _events_processed;
 		
 		int mThreadID;
+
+		// Working memory for factories is now thread-local
+		JFactorySet* mFactorySet = nullptr;  
 
 	private:
 

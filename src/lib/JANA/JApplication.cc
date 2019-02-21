@@ -515,7 +515,7 @@ void JApplication::PrintFinalReport(void)
 		jout << "    Num. factory generators: " << _factoryGenerators.size() <<std::endl;
 		jout << "Num. calibration generators: " << _calibrationGenerators.size() <<std::endl;
 		jout << "      Num. event processors: " << mNumProcessorsAdded <<std::endl;
-		jout << "          Num. factory sets: " << mFactorySetPool.Get_PoolSize() << " (max. " << mFactorySetPool.Get_MaxPoolSize() << ")" << std::endl;
+		// jout << "          Num. factory sets: " << mFactorySetPool.Get_PoolSize() << " (max. " << mFactorySetPool.Get_MaxPoolSize() << ")" << std::endl;
 		jout << "       Num. config. params.: " << _pmanager->GetNumParameters() <<std::endl;
 		jout << "               Num. threads: " << _threadManager->GetNJThreads() <<std::endl;
 	}
@@ -844,21 +844,22 @@ std::shared_ptr<JTask<void>> JApplication::GetVoidTask(void)
 	return mVoidTaskPool.Get_SharedResource();
 }
 
+//TODO: Delete me when the time comes
 //---------------------------------
 // GetFactorySet
 //---------------------------------
-JFactorySet* JApplication::GetFactorySet(void)
-{
-	return mFactorySetPool.Get_Resource(_factoryGenerators);
-}
+//JFactorySet* JApplication::GetFactorySet(void)
+//{
+//	return mFactorySetPool.Get_Resource(_factoryGenerators);
+//}
 
 //---------------------------------
 // Recycle
 //---------------------------------
-void JApplication::Recycle(JFactorySet* aFactorySet)
-{
-	return mFactorySetPool.Recycle(aFactorySet);
-}
+//void JApplication::Recycle(JFactorySet* aFactorySet)
+//{
+//	return mFactorySetPool.Recycle(aFactorySet);
+//}
 
 //---------------------------------
 // UpdateResourceLimits
@@ -878,8 +879,10 @@ void JApplication::UpdateResourceLimits(void)
 	// The exact maximum is hard to determine here. We set it to twice the number
 	// of threads which should be sufficient. The user should be given control to
 	// adjust this themselves in the future, but or now, this should be OK.
-	auto nthreads = _threadManager->GetNJThreads();
-	mFactorySetPool.Set_ControlParams( nthreads*2, 0 );
+	
+	// TODO: Delete me when the time comes
+	//auto nthreads = _threadManager->GetNJThreads();
+	//mFactorySetPool.Set_ControlParams( nthreads*2, 0 );
 }
 
 //---------------------------------

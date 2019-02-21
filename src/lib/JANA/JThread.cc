@@ -76,6 +76,7 @@ JThread::JThread(int aThreadID, JApplication* aApplication, JThreadManager::JEve
 	if(sSleepTimeNanoseconds != mSleepTime.count())
 		mSleepTime = std::chrono::nanoseconds(sSleepTimeNanoseconds);
 
+	
 	_thread = new std::thread( &JThread::Loop, this );
 }
 
@@ -240,6 +241,11 @@ void JThread::Loop(void)
 
 	//Set logger
 	mLogger = new JLog(0); //std::cout
+
+	// Create factory set (from _inside_ thread, so that it is local)
+	vector<JFactoryGenerator*> generators;
+	mApplication->GetJFactoryGenerators(generators);
+	mFactorySet = new JFactorySet(generators);
 
 	/// Loop continuously, processing events
 	try{

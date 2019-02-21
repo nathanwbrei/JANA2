@@ -96,11 +96,12 @@ void JEvent::SetFactorySet(JFactorySet* aFactorySet)
 //---------------------------------
 void JEvent::Release(void)
 {
+	// TODO: Delete me after JFactorySets attached to JThreads instead of JApplication
 	//Release all (pointers to) resources, called when recycled to pool
-	if(mFactorySet != nullptr) {
-		mApplication->Recycle(const_cast<JFactorySet*>(mFactorySet));
-		mFactorySet = nullptr;
-	}
+	//if(mFactorySet != nullptr) {
+	//	mApplication->Recycle(const_cast<JFactorySet*>(mFactorySet));
+	//	mFactorySet = nullptr;
+	//}
 
 	if(mEventSource != nullptr ){
 		mEventSource->DecrementEventCount();

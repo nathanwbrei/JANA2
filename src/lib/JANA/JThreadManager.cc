@@ -77,6 +77,8 @@ JThreadManager::JThreadManager(JApplication* app)
 		mDebugLevel, 
 		"JThreadManager debug level");
 
+	LOG_WARN(mLogger) << "DebugLevel is now " << mDebugLevel << LOG_END;
+
 	app->GetJParameterManager()->SetDefaultParameter(
 		"JANA:THREAD_ROTATE_SOURCES", 
 		mRotateEventSources, 
@@ -549,6 +551,10 @@ JThreadManager::JEventSourceInfo* JThreadManager::CheckAllSourcesDone(std::size_
 //---------------------------------
 void JThreadManager::ExecuteTask(const std::shared_ptr<JTaskBase>& aTask, JEventSourceInfo* aSourceInfo, JQueueSet::JQueueType aQueueType)
 {
+
+	// Reset the thread-local JFactorySet
+	JTHREAD->GetFactorySet()->Reset();
+
 	//If task is from the event queue, prepare it for execution
 	//See function for details
 	if(aQueueType == JQueueSet::JQueueType::Events)
@@ -606,7 +612,7 @@ void JThreadManager::PrepareEventTask(const std::shared_ptr<JTaskBase>& aTask, c
 	//By having the JEvent Release() function recycle the JFactorySet, it doesn't have to be shared_ptr
 	//If it's shared_ptr: more (slow) atomic operations
 	//Just make the JFactorySet a member and cheat a little bit. It's a controlled environment.
-	sEvent->SetFactorySet(mApplication->GetFactorySet());
+	sEvent->SetFactorySet(JTHREAD->GetFactorySet());
 }
 
 //---------------------------------
