@@ -2,25 +2,23 @@
 #include <JANA3/Component.h>
 #include <JANA3/Queue.h>
 
-using std::vector, std::map, std::string;
+using std::vector, std::map, std::string, std::set;
 
 namespace futurejana {
 
   class Topology {
-    map<string, Queue> queues;
-    vector<Op> components;
 
-  public:
-    Queue& get_queue(string name) {
-      return queues[name];
+    map<string, Queue> _queues;
+    vector<Op> _components;
+
+   public:
+
+    bool validate() {
+      // verify that all queues have at least one producer and one consumer
+      // verify that at least one EmitOp, one ReduceOp exist
     }
-
-    void add(Op component) {
-      components.push_back(component);
-    }
-
-
 
   }
 
 }
+
