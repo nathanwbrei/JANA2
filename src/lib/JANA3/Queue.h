@@ -27,7 +27,13 @@ class Queue {
   bool _is_finished(); // is_finished propagates forward from sources
   void _set_finished(bool finished);
 
-  size_t push(vector<T> submissions);
+  void push(vector<T> submissions);
+  // We could also have this return a size_t of _buffer_size - _item_count
+  // Or we could have it return a bool indicating "keep going" or not.
+  // However, this info gets stale and we want to make decisions about thread assignments
+  // at a higher level
+
+
   vector<T> pop(size_t chunksize);
 
 
