@@ -5,7 +5,7 @@ namespace futurejana {
 typedef Event task_t;
 
 
-void MapOp::execute(Topology& topology) {
+void MapArrow::execute(Topology& topology) {
 
   Queue& input_queue = topology.queues[get_input_queue_name()];
 
@@ -21,7 +21,7 @@ void MapOp::execute(Topology& topology) {
 }
 
 
-void ScatterOp::execute(Topology& topology) {
+void ScatterArrow::execute(Topology& topology) {
 
   Queue& input_queue = topology.queues[get_input_queue_name()];
 

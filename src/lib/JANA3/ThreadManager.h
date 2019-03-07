@@ -32,20 +32,20 @@ namespace futurejana {
     /// applied to the same Topology.
 
 
-    void run() = 0;
+    virtual void run() = 0;
     /// The Topology contains all of the information needed to run
     /// the system. 
 
-    void soft_stop() = 0;
+    virtual void soft_stop() = 0;
     /// soft_stop should leave the Topology in a well-defined state
     /// (i.e. no messages get lost) so that it can be continued later,
     /// possibly with a different ThreadManager.
 
-    void hard_stop() = 0;
+    virtual void hard_stop() = 0;
     /// hard_stop should kill all threads immediately without worrying
     /// about data loss.
 
-    vector<ThreadStatus> status() = 0;
+    virtual vector<ThreadStatus> status() = 0;
     /// status() provides a view of thread performance
     /// See ThreadStatus for more details.
   }
