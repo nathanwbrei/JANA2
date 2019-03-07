@@ -7,6 +7,8 @@ using std::string, std::vector, std::multimap, std::pair;
 
 struct Op {
   int chunksize = 1;
+  bool finished = false;
+  
   virtual void execute(Topology& t);
 };
 

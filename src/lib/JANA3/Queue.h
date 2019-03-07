@@ -6,10 +6,11 @@
 template <typename T>
 class Queue {
 
-  size_t _buffer_size;
-  size_t _refill_threshold;
+  size_t empty_threshold = 16;
+  size_t full_threshold = 128;
+  bool is_finished = false;
+
   size_t _item_count;
-  bool _finished;
   T* _buffer;
   std::mutex _mutex;
 
@@ -23,9 +24,6 @@ class Queue {
   ~Queue() {
     delete[] _buffer;
   }
-
-  bool _is_finished(); // is_finished propagates forward from sources
-  void _set_finished(bool finished);
 
   void push(vector<T> submissions);
   // We could also have this return a size_t of _buffer_size - _item_count
