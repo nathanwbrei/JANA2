@@ -144,10 +144,15 @@ public:
             sObjects.push_back(sObject);
 
             // Pretend to be parsing input data
-            //writeMemory(sObject->mRandoms, randint(1000,2000));
             auto sNumRandoms = randint(1000,2000);
-            for(std::size_t sj = 0; sj < sNumRandoms; sj++) {
-                sObject->mRandoms.push_back(gRandomGenerator());
+//            for(std::size_t sj = 0; sj < sNumRandoms; sj++) {
+//                sObject->mRandoms.push_back(gRandomGenerator());
+//            }
+
+            for (int i=0; i<sNumRandoms; ++i) {
+                int x = randint(0, 100);
+                sObject->mRandoms.push_back(x);
+                //sum += x;
             }
         }
 
