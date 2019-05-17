@@ -38,8 +38,11 @@ public:
         // objects.
 
         // Get the JSourceObject and JSourceObject2 objects
+        auto ddfact_start = std::chrono::steady_clock::now();
         auto sobjs = aEvent->Get<JTestSourceData1>();
+        auto ddfact_gotsd1 = std::chrono::steady_clock::now();
         auto sobj2s = aEvent->Get<JTestSourceData2>();
+        auto ddfact_gotsd2 = std::chrono::steady_clock::now();
 
         // Create a jana_test object for each JSourceObject2 object
         std::vector<std::shared_ptr<JTaskBase> > sTasks;
@@ -83,6 +86,12 @@ public:
             st();  // Actually evaluate the subtask
             sSum += st.GetResult();
         }
+        auto ddfact_done = std::chrono::steady_clock::now();
+
+        long sd1 = std::chrono::duration_cast<std::chrono::milliseconds>(ddfact_gotsd1 - ddfact_start).count();
+        long sd2 = std::chrono::duration_cast<std::chrono::milliseconds>(ddfact_gotsd2 - ddfact_gotsd1).count();
+        long subtasks = std::chrono::duration_cast<std::chrono::milliseconds>(ddfact_done - ddfact_gotsd2).count();
+        jout << "JTDDF: sd1: " << sd1 << ", sd2: " << sd2 << ", subs: " << subtasks << std::endl;
     }
 
 };
