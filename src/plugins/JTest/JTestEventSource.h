@@ -17,6 +17,8 @@
 #include "JTestDataObject.h"
 #include "JPerfUtils.h"
 
+thread_local std::mt19937 gRandomGenerator;
+
 class JTestEventSource : public JEventSource {
 public:
 
@@ -101,6 +103,31 @@ public:
     bool GetObjects(const std::shared_ptr<const JEvent> &aEvent,
                     JFactoryT<JTestSourceData1> *aFactory) {
 
+        if(aFactory->GetTag() != "") return false; //Only default tag here
+
+        // Generate a random # of objects
+        auto sNumObjectsDistribution = std::uniform_int_distribution<std::size_t>(1, 20);
+        auto sNumObjects = sNumObjectsDistribution(gRandomGenerator);
+        std::vector<JTestSourceData1*> sObjects;
+        for(std::size_t si = 0; si < sNumObjects; si++)
+        {
+            // Create new JSourceObject
+            auto sObject = new JTestSourceData1(gRandomGenerator(), si);
+            sObjects.push_back( sObject );
+
+            // Supply busy work to take time. This would represent
+            // the parsing of the input data.
+            auto sNumRandomsDistribution = std::uniform_int_distribution<std::size_t>(1000, 2000);
+            auto sNumRandoms = sNumRandomsDistribution(gRandomGenerator);
+            for(std::size_t sj = 0; sj < sNumRandoms; sj++) {
+                sObject->mRandoms.push_back(gRandomGenerator());
+            }
+        }
+
+        //Set the objects in the factory
+        aFactory->Set(std::move(sObjects));
+        return true;
+        /*
         if (aFactory->GetTag() != "") return false; //Only default tag here
 
         size_t sNumObjects = randint(1,20);
@@ -118,6 +145,7 @@ public:
         //Set the objects in the factory
         aFactory->Set(std::move(sObjects));
         return true;
+         */
     }
 
 
