@@ -127,25 +127,6 @@ public:
         //Set the objects in the factory
         aFactory->Set(std::move(sObjects));
         return true;
-        /*
-        if (aFactory->GetTag() != "") return false; //Only default tag here
-
-        size_t sNumObjects = randint(1,20);
-        std::vector<JTestSourceData1 *> sObjects;
-        for (size_t si = 0; si < sNumObjects; si++) {
-
-            // Create new JSourceObject
-            auto sObject = new JTestSourceData1(randdouble(), si);
-            sObjects.push_back(sObject);
-
-            // Pretend to be parsing input data
-            writeMemory(sObject->mRandoms, randint(1000,2000));
-        }
-
-        //Set the objects in the factory
-        aFactory->Set(std::move(sObjects));
-        return true;
-         */
     }
 
 
@@ -163,7 +144,11 @@ public:
             sObjects.push_back(sObject);
 
             // Pretend to be parsing input data
-            writeMemory(sObject->mRandoms, randint(1000,2000));
+            //writeMemory(sObject->mRandoms, randint(1000,2000));
+            auto sNumRandoms = randint(1000,2000);
+            for(std::size_t sj = 0; sj < sNumRandoms; sj++) {
+                sObject->mRandoms.push_back(gRandomGenerator());
+            }
         }
 
         //Set the objects in the factory
