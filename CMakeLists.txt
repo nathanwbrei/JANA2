@@ -35,7 +35,7 @@ add_executable(tests
         src/programs/tests/SchedulerTests.cc
         src/programs/tests/JEventTests.cc
         src/programs/tests/JEventTests.h
-        )
+        src/programs/tests/UniformIntGenTest.cc)
 
 add_executable(playground
         src/programs/playground/playground.cc
