@@ -7,13 +7,15 @@
 
 void consumeCPU(long microsecs) {}
 
-static thread_local std::mt19937* generator = nullptr;
+thread_local std::mt19937* generator = nullptr;
 
 int randint(int min, int max) {
 
-    std::hash<std::thread::id> hasher;
-    long seed = clock() + hasher(std::this_thread::get_id());
-    if (!generator) generator = new std::mt19937(seed);
+    if (generator == nullptr) {
+        std::hash<std::thread::id> hasher;
+        long seed = clock() + hasher(std::this_thread::get_id());
+        generator = new std::mt19937(seed);
+    }
     std::uniform_int_distribution<int> distribution(min, max);
     return distribution(*generator);
 }
