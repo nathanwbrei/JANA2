@@ -150,8 +150,8 @@ public:
 //            }
 
             for (int i=0; i<sNumRandoms; ++i) {
-                int x = randint(0, 100);
-                sObject->mRandoms.push_back(x);
+                //int x = randint(0, 100);
+                sObject->mRandoms.push_back(randdouble());
                 //sum += x;
             }
         }
