@@ -163,7 +163,6 @@ std::unique_ptr<const JArrowPerfSummary> JArrowProcessingController::measure_int
         summary.arrow_name = arrow->get_name();
         summary.chunksize = arrow->get_chunksize();
         summary.messages_pending = arrow->get_pending();
-        summary.is_upstream_active = !arrow->is_upstream_finished();
         summary.threshold = arrow->get_threshold();
         summary.status = arrow->get_status();
 

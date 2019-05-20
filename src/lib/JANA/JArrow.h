@@ -24,7 +24,6 @@ private:
     JArrowMetrics _metrics;      // Performance information accumulated over all workers
     size_t _chunksize = 1;       // Number of items to pop off the input queue at once
     size_t _thread_count = 0;    // Current number of threads assigned to this arrow
-    bool _is_upstream_finished = false;  // TODO: Deprecated. Use _status instead.
     //Status _status = Status::Unopened;  // Lives in JActivable for now
     NodeType _type;
 
@@ -42,19 +41,11 @@ public:
 
     std::string get_name() { return _name; }
 
-    // Written internally, read externally
-
-    bool is_upstream_finished() { return _is_upstream_finished; }
-
 
 protected:
 
-    // Written internally, read externally
-
-    void set_upstream_finished(bool upstream_finished) { _is_upstream_finished = upstream_finished; }
-
+    friend class JScheduler;  // The only entities allowed to set status are JArrow and JScheduler
     void set_status(Status status) { _status = status; }
-
 
 public:
 

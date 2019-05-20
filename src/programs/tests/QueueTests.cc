@@ -6,7 +6,6 @@
 
 TEST_CASE("Queue: Basic functionality") {
     Queue<int> q;
-    q.set_active(true);
 
     REQUIRE(q.get_item_count() == 0);
 

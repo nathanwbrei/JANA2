@@ -5,25 +5,19 @@
 #include <JANA/JEventSourceArrow.h>
 #include <JANA/JApplication.h>
 #include "JEventSourceArrow.h"
+#include "JEventProcessorArrow.h"
 
 
 using SourceStatus = JEventSource::RETURN_STATUS;
 
 JEventSourceArrow::JEventSourceArrow(std::string name,
                                      JEventSource* source,
-                                     EventQueue* output_queue,
                                      JResourcePoolSimple<JFactorySet>* pool
                                      )
     : JArrow(name, false, NodeType::Source)
     , _source(source)
-    , _output_queue(output_queue)
-    , _pool(pool) {
-
-    _output_queue->attach_upstream(this);
-    attach_downstream(_output_queue);
-    _logger = JLogger::nothing();
-}
-
+    , _pool(pool)
+    , _logger(JLogger::nothing()) {};
 
 
 void JEventSourceArrow::execute(JArrowMetrics& result) {
@@ -68,9 +62,6 @@ void JEventSourceArrow::execute(JArrowMetrics& result) {
 
     if (in_status == SourceStatus::kNO_MORE_EVENTS) {
         // There should be a _source.Close() of some kind
-        set_upstream_finished(true);
-        LOG_DEBUG(_logger) << "JEventSourceArrow '" << get_name() << "': "
-                           << "Finished!" << LOG_END;
         status = JArrowMetrics::Status::Finished;
     }
     else if (in_status == SourceStatus::kSUCCESS && out_status == EventQueue::Status::Ready) {
@@ -88,5 +79,10 @@ void JEventSourceArrow::initialize() {
                       << "Initializing" << LOG_END;
     _source->Open();
     _status = Status::Inactive;
+}
+
+void JEventSourceArrow::connect(JEventProcessorArrow& processor) {
+    _output_queue = processor._input_queue;
+
 }
 

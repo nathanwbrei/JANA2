@@ -6,7 +6,7 @@ JScheduler::JScheduler(const std::vector<JArrow*>& arrows)
     : _arrows(arrows)
     , _next_idx(0)
     {
-        _logger = JLoggingService::logger("JScheduler");
+        _logger = JLogger::everything(); //JLoggingService::logger("JScheduler");
     }
 
 
@@ -25,17 +25,20 @@ JArrow* JScheduler::next_assignment(uint32_t worker_id, JArrow* assignment, JArr
     if (assignment != nullptr) {
         assignment->update_thread_count(-1);
 
-        if (assignment->is_upstream_finished() && assignment->get_thread_count() == 0) {
+        if (last_result == JArrowMetrics::Status::Finished) {
+            LOG_INFO(_logger) << "JScheduler: Drained arrow " << assignment->get_name() << LOG_END;
+            assignment->set_status(JArrow::Status::Drained);
+        }
+
+        if (assignment->get_status() == JArrow::Status::Drained && assignment->get_thread_count() == 0) {
 
             // This was the last worker running this arrow, so it can now deactivate
             // We know it is the last worker because we stopped assigning them
             // once is_upstream_finished started returning true
-            assignment->set_active(false);
+            assignment->set_status(JArrow::Status::Finished);
 
-            _mutex.unlock();
-            LOG_INFO(_logger) << "JScheduler: Deactivating arrow " << assignment->get_name() << LOG_END;
+            LOG_INFO(_logger) << "JScheduler: Finished arrow " << assignment->get_name() << LOG_END;
             assignment->notify_downstream(false);
-            _mutex.lock();
         }
     }
 
@@ -47,7 +50,8 @@ JArrow* JScheduler::next_assignment(uint32_t worker_id, JArrow* assignment, JArr
         current_idx += 1;
         current_idx %= _arrows.size();
 
-        if (!candidate->is_upstream_finished() &&
+        auto status = candidate->get_status();
+        if ((status == JArrow::Status::Running || status == JArrow::Status::Draining) &&
             (candidate->is_parallel() || candidate->get_thread_count() == 0)) {
 
             // Found a plausible candidate; done

@@ -10,6 +10,7 @@
 #include <JANA/JEvent.h>
 #include <JANA/JResourcePoolSimple.h>
 #include <JANA/JFactorySet.h>
+#include <JANA/JEventProcessorArrow.h>
 
 using Event = std::shared_ptr<const JEvent>;
 using EventQueue = Queue<Event>;
@@ -24,7 +25,9 @@ private:
     JLogger _logger;
 
 public:
-    JEventSourceArrow(std::string name, JEventSource* source, EventQueue* output_queue, JResourcePoolSimple<JFactorySet>* resourcePool);
+    JEventSourceArrow(std::string name, JEventSource* source, JResourcePoolSimple<JFactorySet>* resourcePool);
+
+    void connect(JEventProcessorArrow& processor);
     void initialize() final;
     void execute(JArrowMetrics& result) final;
 };

@@ -7,22 +7,11 @@
 #include "JEventProcessorArrow.h"
 
 
-JEventProcessorArrow::JEventProcessorArrow(std::string name,
-                                           EventQueue *input_queue,
-                                           EventQueue *output_queue)
+JEventProcessorArrow::JEventProcessorArrow(std::string name)
         : JArrow(std::move(name), true, NodeType::Sink)
-        , _input_queue(input_queue)
-        , _output_queue(output_queue)
-{
-    _input_queue->attach_downstream(this);
-    attach_upstream(_input_queue);
-    _logger = JLogger::nothing();
+        , _input_queue(new EventQueue)
+        , _logger(JLogger::nothing()) { };
 
-    if (_output_queue != nullptr) {
-        _output_queue->attach_upstream(this);
-        attach_downstream(_output_queue);
-    }
-}
 
 void JEventProcessorArrow::add_processor(JEventProcessor* processor) {
     _processors.push_back(processor);
@@ -63,11 +52,7 @@ void JEventProcessorArrow::execute(JArrowMetrics& result) {
     auto end_queue_time = std::chrono::steady_clock::now();
 
     JArrowMetrics::Status status;
-    if (in_status == EventQueue::Status::Finished) {
-        set_upstream_finished(true);
-        status = JArrowMetrics::Status::Finished;
-    }
-    else if (in_status == EventQueue::Status::Ready && out_status == EventQueue::Status::Ready) {
+    if (in_status == EventQueue::Status::Ready && out_status == EventQueue::Status::Ready) {
         status = JArrowMetrics::Status::KeepGoing;
     }
     else {

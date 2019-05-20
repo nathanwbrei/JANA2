@@ -44,11 +44,7 @@ private:
 public:
     SourceArrow(std::string name, Source<T>& source, Queue<T> *output_queue)
         : JArrow(name, false, NodeType::Source)
-        , _source(source)
-        , _output_queue(output_queue) {
-
-        _output_queue->attach_upstream(this);
-        attach_downstream(_output_queue);
+        , _source(source) {
     }
 
     void execute(JArrowMetrics& result) {
@@ -75,12 +71,6 @@ public:
         JArrowMetrics::Status status;
         if (in_status == Source<T>::Status::Finished) {
             _source.finalize();
-            set_upstream_finished(true);
-            set_active(false);
-            notify_downstream(false);
-            // TODO: We may need to have scheduler check that _all_ threads running
-            // this arrow have finished before notifying downstream, otherwise
-            // a couple of straggler events ~might~ get stranded on an inactive queue
             status = JArrowMetrics::Status::Finished;
         }
         else if (in_status == Source<T>::Status::KeepGoing && out_status == QueueBase::Status::Ready) {

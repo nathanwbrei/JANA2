@@ -71,18 +71,14 @@ public:
         auto latency = (end_latency_time - start_latency_time);
         auto overhead = (end_queue_time - start_total_time) - latency;
 
-        JArrowMetrics::Status status;
-        if (in_status == QueueBase::Status::Finished) {
-            set_upstream_finished(true);
-            status = JArrowMetrics::Status::Finished;
-        }
-        else if (in_status == QueueBase::Status::Ready && out_status == QueueBase::Status::Ready) {
-            status = JArrowMetrics::Status::KeepGoing;
+        JArrowMetrics::Status execution_status;
+        if (in_status == QueueBase::Status::Ready && out_status == QueueBase::Status::Ready) {
+            execution_status = JArrowMetrics::Status::KeepGoing;
         }
         else {
-            status = JArrowMetrics::Status::ComeBackLater;
+            execution_status = JArrowMetrics::Status::ComeBackLater;
         }
-        result.update(status, message_count, 1, latency, overhead);
+        result.update(execution_status, message_count, 1, latency, overhead);
     }
 
     size_t get_pending() final { return _input_queue->get_item_count(); }

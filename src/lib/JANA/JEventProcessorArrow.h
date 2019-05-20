@@ -15,6 +15,7 @@ class JEventProcessorArrow : public JArrow {
 public:
     using Event = std::shared_ptr<const JEvent>;
     using EventQueue = Queue<Event>;
+    friend class JEventSourceArrow;  // So that we can connect the two. TODO: Do this at the JArrow level instead
 
 private:
     std::vector<JEventProcessor*> _processors;
@@ -24,10 +25,7 @@ private:
 
 public:
 
-    JEventProcessorArrow(std::string name,
-                         EventQueue *input_queue,
-                         EventQueue *output_queue);
-
+    explicit JEventProcessorArrow(std::string name);
     void add_processor(JEventProcessor* processor);
 
     void execute(JArrowMetrics& result) final;

@@ -8,7 +8,7 @@
 #include "JLogger.h"
 
 
-class QueueBase : public JActivable {
+class QueueBase {
 
 protected:
     size_t _threshold = 128;
@@ -16,7 +16,7 @@ protected:
 
 public:
 
-    enum class Status { Ready, Congested, Empty, Full, Finished };
+    enum class Status { Ready, Congested, Empty, Full };
 
     virtual ~QueueBase() = default;
 
@@ -98,10 +98,7 @@ public:
         if (nitems != 1) {
             return Status::Ready;
         }
-        if (is_active()) {
-            return Status::Empty;
-        }
-        return Status::Finished;
+        return Status::Empty;
     }
 
     Status pop(std::vector<T>& buffer, size_t count) {
@@ -122,10 +119,7 @@ public:
         if (size != 0) {
             return Status::Ready;
         }
-        if (is_active()) {
-            return Status::Empty;
-        }
-        return Status::Finished;
+        return Status::Empty;
     }
 };
 

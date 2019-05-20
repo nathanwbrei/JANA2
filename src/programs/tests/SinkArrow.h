@@ -39,8 +39,6 @@ public:
         , _sink(sink)
         , _input_queue(input_queue) {
 
-        _input_queue->attach_downstream(this);
-        attach_upstream(_input_queue);
     };
 
     void execute(JArrowMetrics& result) override {
@@ -73,21 +71,18 @@ public:
         auto latency = latency_stop_time - latency_start_time;
         auto overhead = (stop_time - start_time) - latency;
 
-        JArrowMetrics::Status status;
+        JArrowMetrics::Status execution_status;
         if (in_status == Queue<T>::Status::Finished) {
-            set_upstream_finished(true);
-            set_active(false);
-            notify_downstream(false);
-            _sink.finalize();
-            status = JArrowMetrics::Status::Finished;
+            set_status(Status::Drained);
+            execution_status = JArrowMetrics::Status::Finished;
         }
         else if (in_status == Queue<T>::Status::Empty) {
-            status = JArrowMetrics::Status::ComeBackLater;
+            execution_status = JArrowMetrics::Status::ComeBackLater;
         }
         else {
-            status = JArrowMetrics::Status::KeepGoing;
+            execution_status = JArrowMetrics::Status::KeepGoing;
         }
-        result.update(status, message_count, 1, latency, overhead);
+        result.update(execution_status, message_count, 1, latency, overhead);
     }
 
     size_t get_pending() final { return _input_queue->get_item_count(); }
