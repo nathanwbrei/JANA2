@@ -40,7 +40,7 @@ add_executable(tests
 
 add_executable(playground
         src/programs/playground/playground.cc
-        src/programs/playground/Arrow.cc src/programs/playground/Arrow.h src/programs/playground/ArrowT.h)
+        src/programs/playground/Arrow.cc src/programs/playground/Arrow.h src/programs/playground/ArrowT.h src/programs/playground/ArrowTMixin.h src/programs/playground/EventArrows.h)
 
 add_library(jana2 STATIC
         src/lib/JANA/JApplication.cc

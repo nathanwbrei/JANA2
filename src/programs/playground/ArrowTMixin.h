@@ -30,90 +30,53 @@
 // Author: Nathan Brei
 //
 
-#ifndef JANA2_ARROW_H
-#define JANA2_ARROW_H
+#ifndef JANA2_ARROWTMIXIN_H
+#define JANA2_ARROWTMIXIN_H
 
+#include "Arrow.h"
 
-#include <queue>
-#include <string>
-#include <memory>
+// ArrowsWithInput, in the general case, have a shared pointer to an input queue
+template <typename InT>
+struct ArrowWithInput {
 
-struct ArrowMetrics {};
+    // The ArrowWithInput has its own input queue
+    InT input;
 
-template <typename T>
-struct Mailbox {
-    std::queue<T> underlying;
+    explicit ArrowWithInput(InT in) : input(in) {}
+
+    // We want all ArrowsWithOutput to have private access to this
+    template <typename OutT> friend class ArrowWithOutput;
 };
 
+// If the ArrowWithInput _doesn't_ have an input queue (i.e. it is a Source),
+// we handle this with a template specialization which does nothing instead.
+template <> struct ArrowWithInput<void> {};
 
-struct Arrow;
 
-class GeneralizedArrow {
-public:
-    enum class Status {Unopened, Inactive, Running, Draining, Drained, Finished, Closed};
+// Similarly, we define the general ArrowWithOutput
+template <typename OutT>
+struct ArrowWithOutput {
 
-private:
-    Status _status = Status::Unopened;
-    std::vector<GeneralizedArrow*> upstream;
-    std::vector<GeneralizedArrow*> downstream;
-
-protected:
-    friend class JScheduler;
-    void set_status(Status status) { _status = status; } // TODO: Protection
-    Status get_status() { return _status; }
-
-    void notify() {
-        // notify all downstream arrows
-        for (GeneralizedArrow* arrow : downstream) {
-            arrow->update();
-        }
-    };
-
-    virtual void update() {};
+    // ArrowsWithOutput have one or more output queues of the correct type.
+    // It doesn't create these, instead it gets them via connect()
+    OutT output;
 
 public:
-    virtual void activate() {};
-    virtual void deactivate() {};
+    // We define a mechanism for connecting an ArrowWithOutput to an ArrowWithInput
+    template <typename InT>
+    void connect(ArrowWithInput<InT>* downstream) {
+        output = downstream->input;
+    }
+};
+
+// In case our arrow doesn't actually have output, don't do any of the above
+template <> struct ArrowWithOutput<void> {};
+
+
+// Finally we create our typed Arrow from S to T by inheriting from ArrowWithInput and ArrowWithOutput.
+template <typename S, typename T>
+struct ArrowT: public Arrow, public ArrowWithInput<S>, public ArrowWithOutput<T> {
 };
 
 
-struct Arrow: public GeneralizedArrow {
-
-    enum class Type {Source, Sink, Stage};
-
-    const std::string _name;
-    const Type _type;
-    const bool _is_parallel;
-
-    ArrowMetrics _metrics;
-    size_t _chunksize = 1;
-    size_t _thread_count = 0;
-
-    Arrow(std::string name, Type type, bool is_parallel)
-            : _name(std::move(name))
-            , _type(type)
-            , _is_parallel(is_parallel) {};
-
-    virtual void execute(ArrowMetrics& result) {};
-
-    virtual void initialize() {}
-
-    virtual void finalize() {};
-
-    void activate() override;
-
-    void deactivate() override;
-
-    void update() override;
-
-};
-
-struct Quiver: public GeneralizedArrow {
-    // Has a JPerfMetrics, maybe even a scheduler
-    // JPerfMetrics _metrics;
-    // std::vector<Arrow*> _arrows;
-
-};
-
-
-#endif //JANA2_ARROW_H
+#endif //JANA2_ARROWTMIXIN_H

@@ -31,3 +31,44 @@
 //
 
 #include "Arrow.h"
+
+void Arrow::activate() {
+    switch (get_status()) {
+        case Status::Unopened: initialize();
+        case Status::Inactive: set_status(Status::Running); notify(); break;
+        case Status::Running:
+        case Status::Draining:
+        case Status::Drained: break;
+        case Status::Finished:
+        case Status::Closed: break; // complain
+    }
+}
+
+void Arrow::deactivate() {
+
+    switch (get_status()) {
+        case Status::Running:
+        case Status::Drained:
+        case Status::Draining:
+            set_status(Status::Inactive);
+            break;
+
+        case Status::Unopened:
+        case Status::Inactive:
+        case Status::Finished:
+        case Status::Closed: break;
+    }
+}
+
+void Arrow::update() {
+    // check statuses of all upstream arrows
+    switch (get_status()) {
+        case Status::Unopened: initialize();
+        case Status::Inactive: // If anything downstream is active, I should be active
+        case Status::Running: // If everything downstream is finished, I should be draining
+        case Status::Draining: // If anything downstream is running, I should be running
+        case Status::Drained: // If anything downstream is running, I should be running
+        case Status::Finished: // If anything downstream is running, I should be running
+        case Status::Closed: break; // I should complain
+    }
+}

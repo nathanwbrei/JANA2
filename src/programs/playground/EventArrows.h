@@ -30,90 +30,41 @@
 // Author: Nathan Brei
 //
 
-#ifndef JANA2_ARROW_H
-#define JANA2_ARROW_H
+#ifndef JANA2_EVENTARROWS_H
+#define JANA2_EVENTARROWS_H
 
+#include "ArrowTMixin.h"
 
-#include <queue>
-#include <string>
-#include <memory>
-
-struct ArrowMetrics {};
-
-template <typename T>
-struct Mailbox {
-    std::queue<T> underlying;
+struct Event {
+    int runNumber;
+    int eventNumber;
+    std::vector<double> data;
 };
 
+struct EvtSrcArrow : public ArrowT<void, Event> {
 
-struct Arrow;
-
-class GeneralizedArrow {
-public:
-    enum class Status {Unopened, Inactive, Running, Draining, Drained, Finished, Closed};
-
-private:
-    Status _status = Status::Unopened;
-    std::vector<GeneralizedArrow*> upstream;
-    std::vector<GeneralizedArrow*> downstream;
-
-protected:
-    friend class JScheduler;
-    void set_status(Status status) { _status = status; } // TODO: Protection
-    Status get_status() { return _status; }
-
-    void notify() {
-        // notify all downstream arrows
-        for (GeneralizedArrow* arrow : downstream) {
-            arrow->update();
-        }
-    };
-
-    virtual void update() {};
-
-public:
-    virtual void activate() {};
-    virtual void deactivate() {};
+    void execute(ArrowMetrics& am) override {
+        Event result;
+        result.eventNumber = 22;
+        output = result;
+    }
 };
 
+struct EvtProcArrow : public ArrowT<Event, Event> {
 
-struct Arrow: public GeneralizedArrow {
-
-    enum class Type {Source, Sink, Stage};
-
-    const std::string _name;
-    const Type _type;
-    const bool _is_parallel;
-
-    ArrowMetrics _metrics;
-    size_t _chunksize = 1;
-    size_t _thread_count = 0;
-
-    Arrow(std::string name, Type type, bool is_parallel)
-            : _name(std::move(name))
-            , _type(type)
-            , _is_parallel(is_parallel) {};
-
-    virtual void execute(ArrowMetrics& result) {};
-
-    virtual void initialize() {}
-
-    virtual void finalize() {};
-
-    void activate() override;
-
-    void deactivate() override;
-
-    void update() override;
-
+    void execute(ArrowMetrics& am) override {
+        auto x = input;
+        x.data.push_back(22);
+        output = x;
+    }
 };
 
-struct Quiver: public GeneralizedArrow {
-    // Has a JPerfMetrics, maybe even a scheduler
-    // JPerfMetrics _metrics;
-    // std::vector<Arrow*> _arrows;
+struct EvtSinkArrow : public ArrowT<Event, void> {
 
+    void execute(ArrowMetrics& am) override {
+        auto x = input;
+        std::cout << "Finished with " << x.eventNumber << std::endl;
+    }
 };
 
-
-#endif //JANA2_ARROW_H
+#endif //JANA2_EVENTARROWS_H
